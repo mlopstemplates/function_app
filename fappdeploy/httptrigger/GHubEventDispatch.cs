@@ -89,6 +89,18 @@ public static class GridEventHandler{
                 }
                 else if(current_event == "Microsoft.MachineLearningServices.ModelRegistered")
                 {
+                    // tags are different in case of model registered, modelTags
+                     if(requestObject[0]["data"]["modelTags"]==null || requestObject[0]["data"]["modelTags"]["githuB_REPOSITORY"]==null)
+                    {
+                        repo_name = Environment.GetEnvironmentVariable("REPO_NAME", EnvironmentVariableTarget.Process);
+                        log.LogInformation("Fetching repo name from Environment variables.");
+                    }
+                    else
+                    {
+                        repo_name = requestObject[0]["data"]["modelTags"]["githuB_REPOSITORY"].ToString();
+                        log.LogInformation("Fetching repo name from modelTags");
+                    }
+                    
                     event_types = "model-registered";
                 }
                 else if(current_event == "Microsoft.MachineLearningServices.ModelDeployed")
