@@ -32,6 +32,10 @@ public static class GridEventHandler
     {
         return requestObject[0]["data"];
     }
+    private static dynamic ParseAppServiceEvent(dynamic requestObject)
+    {
+        return requestObject[0]["data"];
+    }
     private static dynamic ParseBlobStorageEvent(dynamic requestObject)
     {
         return requestObject[0]["data"];
@@ -106,17 +110,26 @@ public static class GridEventHandler
 
         var queryParams = System.Web.HttpUtility.ParseQueryString(req.RequestUri.Query);
         string repo_name = queryParams.Get("repoName");
+        log.LogInformation("fetching repo name from query parameters." + repo_name);
 
         if (event_data.Length > 2 && !string.IsNullOrEmpty(repo_name))
         {
-            log.LogInformation("fetching repo name from query parameters." + repo_name);
-            event_type = event_source.ToLower() + "-" + event_data[2].ToLower();
+            event_type = event_source.ToLower()  ;
+
+            for (int index = 2; index < event_data.Length; index++)
+            {
+                event_type += "-" + event_data[index].ToLower();
+            }
             var req_data = requestObject[0]["data"];
 
             switch (event_source)
             {
                 case "AppConfiguration":
                     req_data = ParseAppConfigurationEvent(requestObject);
+                    break;
+
+                case "Web/sites":
+                    req_data = ParseAppServiceEvent(requestObject);
                     break;
 
                 case "Storage":
