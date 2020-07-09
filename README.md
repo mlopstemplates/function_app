@@ -1,5 +1,5 @@
 # function_app
-This repository contains code for Azure Function app which includes an Http Trigger function. The function can send github repository dispatch event when triggered. It is especially modelled to send Azure machine learning events when subscribed to the event grid of the workspace with the endpoint as the function url. 
+This repository contains code for Azure Function app which includes an Http Trigger function. The function can send github repository dispatch event when triggered. It is  modelled to send Azure events when subscribed to the event grid of the workspace with the endpoint as the function url. 
 
 #### Basic Requirements to use the function:
 1. Add personal access token in the application settings of the function app with the name **PAT_TOKEN**.
@@ -7,11 +7,16 @@ This repository contains code for Azure Function app which includes an Http Trig
 
 ### Events and its corresponding event types sent by the function:
 ```sh
-  1.Microsoft.MachineLearningServices.ModelRegistered: model-registered
-  2.Microsoft.MachineLearningServices.ModelDeployed: model-deployed
-  3.Microsoft.MachineLearningServices.RunCompleted: run-completed
-  4.Microsoft.MachineLearningServices.DatasetDriftDetected: data-drift-detected
-  5.Microsoft.MachineLearningServices.RunStatusChanged: run-status-changed
+Azure App Configuration Events
+  1.Microsoft.AppConfiguration.KeyValueModified: appconfiguration-keyvaluemodified
+  2.Microsoft.AppConfiguration.KeyValueDeleted: appconfiguration-keyvaluedeleted
+  
+Azure Machine Learning Events
+  1.Microsoft.MachineLearningServices.ModelRegistered: machinelearning-modelregistered
+  2.Microsoft.MachineLearningServices.ModelDeployed: machinelearning-modeldeployed
+  3.Microsoft.MachineLearningServices.RunCompleted: machinelearning-runcompleted
+  4.Microsoft.MachineLearningServices.DatasetDriftDetected: machinelearning-datadriftdetected
+  5.Microsoft.MachineLearningServices.RunStatusChanged: machinelearning-runstatuschanged
 ```
   
 ### Example:
@@ -20,7 +25,7 @@ This repository contains code for Azure Function app which includes an Http Trig
 
   On:
     repository_dispatch:
-        types: [run-completed]
+        types: [machinelearning-modelregistered]
   (...)
 
 ```
