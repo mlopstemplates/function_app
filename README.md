@@ -72,7 +72,7 @@ Azure
 ```
   
 ### Example:
-#### To trigger the workflow when the run is completed:
+#### To trigger the workflow when the Machine Learning model is registered:
 ```sh
 
   On:
