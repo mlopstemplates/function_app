@@ -67,7 +67,34 @@ Azure Machine Learning Events
   4.Microsoft.MachineLearningServices.DatasetDriftDetected: machinelearning-datadriftdetected
   5.Microsoft.MachineLearningServices.RunStatusChanged: machinelearning-runstatuschanged
 
-Azure
+Azure Maps Events
+  1.Microsoft.Maps.GeofenceEntere: maps-geofenceentered 
+  2.Microsoft.Maps.GeofenceExited: maps-geofenceexited
+  3.Microsoft.Maps.GeofenceResult: maps-geofenceresult
+  
+Azure Media Services Events
+  1.Microsoft.Media.JobStateChange: media-jobstatechange
+  2.Microsoft.Media.JobScheduled: media-jobscheduled
+  3.Microsoft.Media.JobProcessing: media-jobprocessing
+  4.Microsoft.Media.JobCanceling: media-jobcanceling
+  5.Microsoft.Media.JobFinished: media-jobfinished
+  6.Microsoft.Media.JobCanceled: media-jobcanceled
+  7.Microsoft.Media.JobErrore: media-joberrored
+  8.Microsoft.Media.JobStateChange: media-joboutputstatechange
+  9.Microsoft.Media.JobOutputScheduled: media-joboutputscheduled
+  10.Microsoft.Media.JobOutputProcessing: media-joboutputprocessing
+  11.Microsoft.Media.JobOutputCanceling: media-joboutputcanceling
+  12.Microsoft.Media.JobOutputFinished: media-joboutputfinished
+  13.Microsoft.Media.JobOutputCanceled: media-joboutputcanceled
+  14.Microsoft.Media.JobOutputErrore: media-joboutputerrored
+
+Azure Service Bus Events
+  1.Microsoft.ServiceBus.ActiveMessagesAvailableWithNoListeners: servicebus-activemessageavailablewithnolisteners
+  2.Microsoft.ServiceBus.DeadletterMessagesAvailableWithNoListener:  servicebus-deadlettermessagesavailablewithnolisteners
+  
+Azure SignalR Service Events
+  1.Microsoft.SignalRService.ClientConnectionConnected: signalrservice-clientconnectionconnected
+  2.Microsoft.SignalRService.ClientConnectionDisconnected: signalrservice-clientconnectiondisconnected
 
 ```
   
