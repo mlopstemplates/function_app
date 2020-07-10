@@ -59,7 +59,6 @@ Azure Key Vault
   8.Microsoft.KeyVault.SecretNearExpiry: keyvault-secretnearexpiry
   9.Microsoft.KeyVault.SecretExpired: keyvault-secretexpired
   
-
 Azure Machine Learning Events
   1.Microsoft.MachineLearningServices.ModelRegistered: machinelearning-modelregistered
   2.Microsoft.MachineLearningServices.ModelDeployed: machinelearning-modeldeployed
