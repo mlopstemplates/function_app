@@ -3,11 +3,10 @@ This repository contains code for Azure Function app which includes an Http Trig
 
 #### Basic Requirements to use the function:
 1. Add personal access token in the application settings of the function app with the name **PAT_TOKEN**.
-2. Add owner/repo name in the application settings of the function app with the name **REPO_NAME**.
 
-### Events and its corresponding event types sent by the function:
+### Events and its corresponding event types sent by the function: 
 ```sh
-Azure App Configuration Events
+Azure App Configuration Events [Link](https://docs.microsoft.com/en-us/azure/event-grid/event-schema-app-configuration/) 
   1.Microsoft.AppConfiguration.KeyValueModified: appconfiguration-keyvaluemodified
   2.Microsoft.AppConfiguration.KeyValueDeleted: appconfiguration-keyvaluedeleted
   
