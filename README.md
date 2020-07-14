@@ -6,7 +6,9 @@ This repository contains code for Azure Function app which includes an Http Trig
 
 ### Events and its corresponding event types sent by the function: 
 ```sh
-Azure App Configuration Events```sh [Link](https://docs.microsoft.com/en-us/azure/event-grid/event-schema-app-configuration/)```sh
+Azure App Configuration Events
+``` [Link](https://docs.microsoft.com/en-us/azure/event-grid/event-schema-app-configuration/)
+```sh
   1.Microsoft.AppConfiguration.KeyValueModified: appconfiguration-keyvaluemodified
   2.Microsoft.AppConfiguration.KeyValueDeleted: appconfiguration-keyvaluedeleted
   
