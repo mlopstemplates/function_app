@@ -181,6 +181,8 @@ public static class GridEventHandler
                    
             }
 
+            log.LogInformation("event type : " + event_type);
+
             using (var httpClient = new HttpClient())
             {
                 httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -195,8 +197,7 @@ public static class GridEventHandler
                 {
                     ["unit "] = false,
                     ["integration"] = true,
-                    ["data"] = req_data,
-                    ["event_source"] = event_source
+                    ["data"] = req_data
                 };
 
                 var payload = Newtonsoft.Json.JsonConvert.SerializeObject(new Newtonsoft.Json.Linq.JObject { ["event_type"] = event_type, ["client_payload"] = client_payload });
