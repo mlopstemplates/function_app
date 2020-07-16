@@ -1,16 +1,14 @@
  [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAyaz43%2Ffunction_app%2Fmaster%2F.cloud%2F.azure%2Fazuredeploy.json)
 
 # function_app 
-This repository contains code for Azure Function app which includes an Http Trigger function. The function can send github repository dispatch event when triggered. It is  modelled to send Azure events when subscribed to the event grid of the workspace with the endpoint as the function url. 
+This repository contains code for Azure Function app which contains an Http Trigger function. The function can send github repository dispatch event when triggered. It is  modelled to send All type of Azure events when subscribed to the event grid of the workspace with the endpoint as the function url. 
 
 #### Basic Requirements to use the function:
 1. Add personal access token in the application settings of the function app with the name **PAT_TOKEN**.
 
-### Events and its corresponding event types sent by the function: 
+### Events and its corresponding event types sent by the function: [Link](https://docs.microsoft.com/en-us/azure/event-grid/event-schema-app-configuration/)
 ```sh
 Azure App Configuration Events
-``` [Link](https://docs.microsoft.com/en-us/azure/event-grid/event-schema-app-configuration/)
-```sh
   1.Microsoft.AppConfiguration.KeyValueModified: appconfiguration-keyvaluemodified
   2.Microsoft.AppConfiguration.KeyValueDeleted: appconfiguration-keyvaluedeleted
   
