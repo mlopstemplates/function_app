@@ -1,4 +1,4 @@
-# function_app
+# function_app  [![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fgithub.com%2FAyaz43%2Ffunction_app%2Fblob%2Fmaster%2F.cloud%2F.azure%2Fazuredeploy.json)
 This repository contains code for Azure Function app which includes an Http Trigger function. The function can send github repository dispatch event when triggered. It is  modelled to send Azure events when subscribed to the event grid of the workspace with the endpoint as the function url. 
 
 #### Basic Requirements to use the function:
