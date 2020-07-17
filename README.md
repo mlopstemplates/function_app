@@ -1,12 +1,25 @@
  [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAyaz43%2Ffunction_app%2Fmaster%2F.cloud%2F.azure%2Fazuredeploy.json)
 
 # function_app 
-This repository contains code for Azure Function app which contains an Http Trigger function. The function can send github repository dispatch event when triggered. It is  modelled to send All type of Azure events when subscribed to the event grid of the workspace with the endpoint as the function url. 
+This repository contains an Azure Function app which contains an Http Trigger function. The function can send github repository dispatch event when triggered. It is  modelled to send All type of Azure events when subscribed to the event grid of the workspace with the endpoint as the function url. 
 
 #### Basic Requirements to use the function:
-1. Add personal access token in the application settings of the function app with the name **PAT_TOKEN**.
+  1. Add personal access token in the application settings of the function app with the name **PAT_TOKEN**.
 
-### Events and its corresponding event types sent by the function: [Link](https://docs.microsoft.com/en-us/azure/event-grid/event-schema-app-configuration/)
+#### Basic Requirements to use the Deploy to Azure button (Mandatory):
+  1. **Subscription**: You need to select a subscription plan to in order to deploy to Azure. Get started today with a [free Azure account](https://azure.com/free/open-source)!
+  2. **Resource Group**: You can either select an existing resource group or create a new one.
+  3. **Pat Token**: You need to provide the personal access token.
+
+#### Other optional configurable parameters 
+  1. Function App Name : Name use as base-template to name the resources to be deployed in Azure (Default = fappDeploy).
+  2. Function Git Hub URL: The URL of GitHub (ending by .git)
+  3. Function Git Hub Branch: Name of the branch to use when deploying (Default = master).
+  4. Function Folder: The name of folder containing the function code (Default = fappDeploy).
+  5. Owner Name: Owner of this deployment, person to contact for question.
+  6. Expire On: Just a text value (format: yyyy-MM-dd) that express when it is safe to delete these resources.
+
+### Events and its corresponding event types sent by the event-grid: [Link](https://docs.microsoft.com/en-us/azure/event-grid/overview#event-sources)
 ```sh
 Azure App Configuration Events
   1.Microsoft.AppConfiguration.KeyValueModified: appconfiguration-keyvaluemodified
