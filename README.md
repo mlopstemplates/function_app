@@ -12,7 +12,7 @@ This function-app once deployed the function can be registered to event grid eit
   2. **Resource Group**: You can either select an existing resource group or create a new one.
   3. **Pat Token**: You need to provide the personal access token.
   
-  ##### Other optional configurable parameters 
+  ##### Other optional configurable parameters to use with Deploy to Azure button
    1. **Function App Name**: Name use as base-template to name the resources to be deployed in Azure (Default = fappDeploy).
    2. **Function Git Hub URL**: The URL of GitHub (ending by .git)
    3. **Function Git Hub Branch**: Name of the branch to use when deploying (Default = master).
