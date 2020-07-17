@@ -2,6 +2,7 @@
 
 # function_app 
 This repository contains an Azure Function app which contains an Http Trigger function. The function can send github repository dispatch event when triggered. It is  modelled to send All type of Azure events when subscribed to the event grid of the workspace with the endpoint as the function url. 
+This function-app once deployed the function can be registered to event grid either manually or using our GitHub Action.
 
 #### Basic Requirements to use the function:
   1. Add personal access token in the application settings of the function app with the name **PAT_TOKEN**.
@@ -109,9 +110,18 @@ Azure SignalR Service Events
   2.Microsoft.SignalRService.ClientConnectionDisconnected: signalrservice-clientconnectiondisconnected
 
 ```
-  
+
 ### Example:
-#### To trigger the workflow when the Machine Learning model is registered:
+#### To send any event from event-grid to the function app:
+```
+Request Method: POST
+Request URL: http://host/api/generic_triggers?repoName=TestGenericRepositoryDispatch
+
+```
+
+
+### Example:
+#### To trigger the workflow of the repository provided in function app URL(repoName), when the Machine Learning model is registered:
 ```sh
 
   On:
@@ -120,3 +130,4 @@ Azure SignalR Service Events
   (...)
 
 ```
+
