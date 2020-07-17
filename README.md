@@ -113,6 +113,7 @@ Azure SignalR Service Events
 
 ### Example:
 #### To send any event from event-grid to the function app:
+You need to specify the repository name in the function URL, as request parameter **repoName**
 ```
 Request Method: POST
 Request URL: http://host/api/generic_triggers?repoName=TestGenericRepositoryDispatch
@@ -130,4 +131,3 @@ Request URL: http://host/api/generic_triggers?repoName=TestGenericRepositoryDisp
   (...)
 
 ```
-
