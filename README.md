@@ -7,7 +7,7 @@ This repository contains an Azure Function app which contains an Http Trigger fu
   1. Add personal access token in the application settings of the function app with the name **PAT_TOKEN**.
 
 #### Basic Requirements to use the Deploy to Azure button (Mandatory):
-  1. **Subscription**: You need to select a subscription plan to in order to deploy to Azure. Get started today with a [free Azure account](https://azure.com/free/open-source)!
+  1. **Subscription**: You need to select a subscription plan in order to deploy to Azure. Get started today with a [free Azure account](https://azure.com/free/open-source)!
   2. **Resource Group**: You can either select an existing resource group or create a new one.
   3. **Pat Token**: You need to provide the personal access token.
 
