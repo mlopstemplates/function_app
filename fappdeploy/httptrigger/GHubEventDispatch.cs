@@ -180,7 +180,12 @@ public static class GridEventHandler
                     return (ActionResult)new OkObjectResult("Unrecognized event, could not be sent");
                    
             }
-
+            string req_type = req_data.GetType().ToString();
+            if(req_type == "Newtonsoft.Json.Linq.JValue")
+            {
+                String tmp = req_data.ToString();
+                req_data= JsonConvert.DeserializeObject(tmp);
+            }
             log.LogInformation("event type : " + event_type);
 
             using (var httpClient = new HttpClient())
