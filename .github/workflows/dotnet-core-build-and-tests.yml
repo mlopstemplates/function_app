@@ -19,11 +19,11 @@ jobs:
         dotnet-version: 3.1.301
     - name: Install dependencies for fappdeploy
       run: |
-           cd ./function_app/fappdeploy/
+           cd ./fappdeploy/
            dotnet restore
     - name: Build fappdeploy
       run: |
-           cd ./function_app/fappdeploy/
+           cd ./fappdeploy/
            dotnet build --configuration Release --no-restore  
     - name: Test
       run: dotnet test --no-restore --verbosity normal
