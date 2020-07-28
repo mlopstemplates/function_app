@@ -49,4 +49,6 @@ jobs:
            dotnet build --configuration Release --no-restore   
                  
     - name: Test functionAppTests
-      run: dotnet test --no-restore --verbosity normal
+      run: |
+           cd ./FunctionTestHelper/
+           dotnet test --no-restore --verbosity normal
