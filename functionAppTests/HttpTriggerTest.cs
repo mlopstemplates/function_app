@@ -20,9 +20,6 @@ namespace DotNet.Test
     [TestClass]
     public class HttpTriggerTest : FunctionTestHelper.FunctionTest
     {
-        ILogger log;
-        ExecutionContext context;
-
         [TestMethod]
         public async Task Test_ParseEventGridValidationCode_Subscription_Event()
         {
@@ -38,7 +35,7 @@ namespace DotNet.Test
             
         }
 		
-		[TestMethod]
+	[TestMethod]
         public async Task Test_ParseEventGridValidationCode_When_Not_Subscription_Event()
         {
             var query = new Dictionary<String, StringValues>();
