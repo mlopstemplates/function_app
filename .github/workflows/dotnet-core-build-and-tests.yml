@@ -40,7 +40,7 @@ jobs:
            
     - name: Install dependencies for functionAppTests
       run: |
-           cd ./FunctionTestHelper/
+           cd ./functionAppTests/
            dotnet restore
            
     - name: Build functionAppTests
