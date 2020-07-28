@@ -45,10 +45,10 @@ jobs:
            
     - name: Build functionAppTests
       run: |
-           cd ./FunctionTestHelper/
+           cd ./functionAppTests/
            dotnet build --configuration Release --no-restore   
                  
     - name: Test functionAppTests
       run: |
-           cd ./FunctionTestHelper/
+           cd ./functionAppTests/
            dotnet test --no-restore --verbosity normal
