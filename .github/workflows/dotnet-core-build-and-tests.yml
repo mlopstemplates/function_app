@@ -17,13 +17,36 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
+   
     - name: Install dependencies for fappdeploy
       run: |
            cd ./fappdeploy/
            dotnet restore
+           
     - name: Build fappdeploy
       run: |
            cd ./fappdeploy/
            dotnet build --configuration Release --no-restore  
-    - name: Test
+           
+    - name: Install dependencies for FunctionTestHelper
+      run: |
+           cd ./FunctionTestHelper/
+           dotnet restore
+           
+    - name: Build FunctionTestHelper
+      run: |
+           cd ./FunctionTestHelper/
+           dotnet build --configuration Release --no-restore  
+           
+    - name: Install dependencies for functionAppTests
+      run: |
+           cd ./FunctionTestHelper/
+           dotnet restore
+           
+    - name: Build functionAppTests
+      run: |
+           cd ./FunctionTestHelper/
+           dotnet build --configuration Release --no-restore   
+                 
+    - name: Test functionAppTests
       run: dotnet test --no-restore --verbosity normal
