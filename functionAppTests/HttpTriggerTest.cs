@@ -120,7 +120,7 @@ namespace DotNet.Test
             ExecutionContext context = Mock.Of<ExecutionContext>();
             Environment.SetEnvironmentVariable("PAT_TOKEN", "patToken");
 
-            var data = File.ReadAllText(@"./../../../test.json");
+            var data = File.ReadAllText(@"./../../../testFiles/test.json");
             var request = CreateHttpRequest(data, "repoName", "dummyRepo");
            
             var result = await GridEventHandler.Run(request, log, context);
@@ -137,7 +137,7 @@ namespace DotNet.Test
             ExecutionContext context = Mock.Of<ExecutionContext>();
             Environment.SetEnvironmentVariable("PAT_TOKEN", "patToken");
 
-            var data = File.ReadAllText(@"./../../../testSuscriptionValidationResponse.json");
+            var data = File.ReadAllText(@"./../../../testFiles/testSuscriptionValidationResponse.json");
             var request = CreateHttpRequest(data, "repoName", "dummyRepo");
 
             var result = await GridEventHandler.Run(request, log, context);
