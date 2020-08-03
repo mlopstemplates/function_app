@@ -1,54 +1,49 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
-using Moq;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace FunctionTestHelper
 {
     public abstract class FunctionTest
     {
-
-        public HttpRequest HttpRequestSetup(Dictionary<String, StringValues> query, string body)
+      public static DefaultHttpRequest CreateHttpRequest( dynamic body, string queryStringKey, string queryStringValue)
         {
-            var reqMock = new Mock<HttpRequest>();
-
-            reqMock.Setup(req => req.Query).Returns(new QueryCollection(query));
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
             writer.Write(body);
             writer.Flush();
             stream.Position = 0;
-            reqMock.Setup(req => req.Body).Returns(stream);
-            return reqMock.Object;
+            var request = new DefaultHttpRequest(new DefaultHttpContext())
+            {
+                Query = new QueryCollection(CreateDictionary(queryStringKey, queryStringValue)),
+                Body = stream,
+                Method = HttpMethod.Post.ToString(),
+                ContentType = "application/json"
+
+            };
+            return request;
         }
 
-    }
-
-    public class AsyncCollector<T> : IAsyncCollector<T>
-    {
-        public readonly List<T> Items = new List<T>();
-
-        public Task AddAsync(T item, CancellationToken cancellationToken = default(CancellationToken))
+        private static Dictionary<string, StringValues> CreateDictionary(string key, string value)
         {
-
-            Items.Add(item);
-
-            return Task.FromResult(true);
+            var qs = new Dictionary<string, StringValues>
+            {
+                { key, value }
+            };
+            return qs;
         }
-
-        public Task FlushAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public static MemoryStream SerializeToStream(object o)
         {
-            return Task.FromResult(true);
+            MemoryStream stream = new MemoryStream();
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(stream, o);
+            return stream;
         }
+
     }
 }
