@@ -74,11 +74,11 @@ Azure Key Vault
   9.Microsoft.KeyVault.SecretExpired: keyvault-secretexpired
   
 Azure Machine Learning Events
-  1.Microsoft.MachineLearningServices.ModelRegistered: machinelearning-modelregistered
-  2.Microsoft.MachineLearningServices.ModelDeployed: machinelearning-modeldeployed
-  3.Microsoft.MachineLearningServices.RunCompleted: machinelearning-runcompleted
-  4.Microsoft.MachineLearningServices.DatasetDriftDetected: machinelearning-datadriftdetected
-  5.Microsoft.MachineLearningServices.RunStatusChanged: machinelearning-runstatuschanged
+  1.Microsoft.MachineLearningServices.ModelRegistered: machinelearningservices-modelregistered
+  2.Microsoft.MachineLearningServices.ModelDeployed: machinelearningservices-modeldeployed
+  3.Microsoft.MachineLearningServices.RunCompleted: machinelearningservices-runcompleted
+  4.Microsoft.MachineLearningServices.DatasetDriftDetected: machinelearningservices-datadriftdetected
+  5.Microsoft.MachineLearningServices.RunStatusChanged: machinelearningservices-runstatuschanged
 
 Azure Maps Events
   1.Microsoft.Maps.GeofenceEntere: maps-geofenceentered 
