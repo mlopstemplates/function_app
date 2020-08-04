@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 using FunctionTestHelper;
 using System.Net.Http;
 
-namespace DotNet.Test
+namespace FunctionAppTest
 {
     [TestClass]
     public class HttpTriggerTest 
