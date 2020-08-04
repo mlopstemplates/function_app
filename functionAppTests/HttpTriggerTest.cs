@@ -5,17 +5,27 @@ using System.Collections.Generic;
 using System;
 using Microsoft.Extensions.Primitives;
 using System.IO;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.WebJobs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using FunctionTestHelper;
+using System.Net.Http;
 
 namespace DotNet.Test
 {
     [TestClass]
-    public class HttpTriggerTest : FunctionTestHelper.FunctionTest
+    public class HttpTriggerTest 
     {
+        private dynamic log;
+        private ExecutionContext context;
+
+        [TestInitialize]
+        public void Test_Initialize()
+        {
+            log = Mock.Of<ILogger>();
+            context = Mock.Of<ExecutionContext>();
+        }
 
         [TestMethod]
         public async Task Test_ParseEventGridValidationCode_Subscription_Event()
@@ -27,10 +37,10 @@ namespace DotNet.Test
             JObject json = JObject.Parse(result);
             JToken value = json.GetValue("validationResponse");
             Assert.AreEqual("VALIDATION_CODE", value);
-            
+
         }
-		
-		[TestMethod]
+
+        [TestMethod]
         public async Task Test_ParseEventGridValidationCode_When_Not_Subscription_Event()
         {
             var query = new Dictionary<String, StringValues>();
@@ -38,7 +48,7 @@ namespace DotNet.Test
             dynamic requestObject = JsonConvert.DeserializeObject(body);
             string result = GridEventHandler.ParseEventGridValidationCode(requestObject);
             Assert.AreEqual("", result);
-            
+
         }
 
         [TestMethod]
@@ -97,8 +107,8 @@ namespace DotNet.Test
             Assert.AreEqual(value, "BlockBlob");
             Assert.AreEqual(json.Count, 10);
         }
-		
-		[TestMethod]
+
+        [TestMethod]
         public async Task Test_getRequestDataFromRequestObject_ContainerRegistry_When_Data_Is_String()
         {
             var query = new Dictionary<String, StringValues>();
@@ -112,37 +122,54 @@ namespace DotNet.Test
             Assert.AreEqual(value, "1382c70d-30dc-4478-832c-723a6fc39f2d");
             Assert.AreEqual(json.Count, 5);
         }
-        
+
         [TestMethod]
         public async Task Test_RunMethod()
         {
-            var log = Mock.Of<ILogger>();
-            ExecutionContext context = Mock.Of<ExecutionContext>();
             Environment.SetEnvironmentVariable("PAT_TOKEN", "patToken");
 
             var data = File.ReadAllText(@"./../../../testFiles/test.json");
-            var request = CreateHttpRequest(data, "repoName", "dummyRepo");
-           
-            var result = await GridEventHandler.Run(request, log, context);
-            var resultObject = (OkObjectResult)result;
-           
-            Assert.AreEqual(resultObject.Value, "dispatch event sent");
+            var request = TestFactory.CreateHttpRequest("repoName", "dummyRepo", data);
 
+            // call the endpoint
+            var response = (HttpResponseMessage)await GridEventHandler.Run(request, log, context);
+            string result = await response.Content.ReadAsStringAsync();
+            Assert.AreEqual(result, "dispatch event sent");
         }
 
         [TestMethod]
         public async Task Test_RunMethodForSubscriptionValidationRequest()
         {
-            var log = Mock.Of<ILogger>();
-            ExecutionContext context = Mock.Of<ExecutionContext>();
-            Environment.SetEnvironmentVariable("PAT_TOKEN", "patToken");
-
             var data = File.ReadAllText(@"./../../../testFiles/testSuscriptionValidationResponse.json");
-            var request = CreateHttpRequest(data, "repoName", "dummyRepo");
+            var request = TestFactory.CreateHttpRequest("repoName", "dummyRepo", data);
 
             var result = await GridEventHandler.Run(request, log, context);
-            var resultObject = (OkObjectResult)result;
-            Assert.AreEqual(resultObject.Value, "{\"validationResponse\":\"512d38b6-c7b8-40c8-89fe-f46f9e9622b6\"}");
+            var resultString = await result.Content.ReadAsStringAsync();
+            Assert.AreEqual(resultString , "{\"validationResponse\":\"512d38b6-c7b8-40c8-89fe-f46f9e9622b6\"}");
+
+        }
+
+        [TestMethod]
+        public async Task Test_RunMethodForInvalidEvent()
+        {
+            var data = File.ReadAllText(@"./../../../testFiles/requestWithInvalidEventType.json");
+            var request = TestFactory.CreateHttpRequest("repoName", "dummyRepo", data);
+
+            var result = await GridEventHandler.Run(request, log, context);
+            var resultString = await result.Content.ReadAsStringAsync();
+            Assert.AreEqual(resultString, "Unrecognized event, could not be sent");
+
+        }
+
+        [TestMethod]
+        public async Task Test_RunMethodForInvalidRequestObject()
+        {
+            var data = File.ReadAllText(@"./../../../testFiles/testInvaidRequestObject.json");
+            var request = TestFactory.CreateHttpRequest("repoName", "dummyRepo", data);
+
+            var result = await GridEventHandler.Run(request, log, context);
+            var resultString = await result.Content.ReadAsStringAsync();
+            Assert.AreEqual(resultString, "request object does not have the required property 'data' !");
 
         }
     }
