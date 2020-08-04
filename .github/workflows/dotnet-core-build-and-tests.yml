@@ -8,10 +8,21 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Build and Test fappdeploy
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.301
+   
+    - name: Install dependencies and Build fappdeploy
       run: |
-           cd fappdeploy
+           cd ./fappdeploy/
+           dotnet restore
+           dotnet build
+           
+    - name: build and test functionAppTests
+      run: |
+           cd ./functionAppTests/
            dotnet restore
            dotnet build
            dotnet test
-           
