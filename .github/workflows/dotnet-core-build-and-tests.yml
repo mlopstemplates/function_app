@@ -8,15 +8,9 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Install dependencies and Build fappdeploy
+    - name: Build and Test fappdeploy
       run: |
-           cd ./fappdeploy/
-           dotnet restore
-           dotnet build
-           
-    - name: build and test functionAppTests
-      run: |
-           cd ./functionAppTests/
            dotnet restore
            dotnet build
            dotnet test
+           
