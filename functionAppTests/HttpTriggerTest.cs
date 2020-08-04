@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Azure.WebJobs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using FunctionTestHelper;
 using System.Net.Http;
 
 namespace FunctionAppTest
