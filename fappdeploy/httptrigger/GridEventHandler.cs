@@ -238,6 +238,10 @@ public static class GridEventHandler
 
                 var content = new StringContent(payload, Encoding.UTF8, "application/json");
                 HttpResponseMessage response = await httpClient.PostAsync("https://api.github.com/repos/Ayaz43/" + repo_name + "/dispatches", content);
+                
+                if (response.StatusCode.ToString() == "Unauthorized")
+                   return (ActionResult)new OkObjectResult("Unauthorized dispatch event could not be sent, PATTOKEN is Not Valid");
+                
                 var resultString = await response.Content.ReadAsStringAsync();
                 return (ActionResult)new OkObjectResult("dispatch event sent");
             }
