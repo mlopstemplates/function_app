@@ -10,6 +10,7 @@ jobs:
     steps:
     - name: Build and Test fappdeploy
       run: |
+           cd ./fappdeploy/
            dotnet restore
            dotnet build
            dotnet test
