@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
@@ -11,7 +9,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Net.Http;
 using System.Net;
-using System.Collections;
 
 public static class GridEventHandler
 {
@@ -244,7 +241,7 @@ public static class GridEventHandler
                 httpClient.DefaultRequestHeaders.Add("User-Agent", "Awesome-Octocat-App");
                 httpClient.DefaultRequestHeaders.Accept.Clear();
 
-                var PATTOKEN = "02998a31188ac120c15bbce9458aa78abec79e6b"; //Environment.GetEnvironmentVariable("PAT_TOKEN", EnvironmentVariableTarget.Process);
+                var PATTOKEN = Environment.GetEnvironmentVariable("PAT_TOKEN", EnvironmentVariableTarget.Process);
 
                 httpClient.DefaultRequestHeaders.Add("Authorization", "token " + PATTOKEN);
 
