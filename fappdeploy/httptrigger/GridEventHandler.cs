@@ -1,15 +1,17 @@
 using System;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Http;
 using System.Net.Http.Headers;
-using System.Net.Http;
 using System.Text;
+using System.Net.Http;
+using System.Net;
+using System.Collections;
 
 public static class GridEventHandler
 {
@@ -28,34 +30,45 @@ public static class GridEventHandler
         return webhook_res;
     }
 
+    public static HttpResponseMessage createHttpResponse(HttpStatusCode statusCode, string content)
+    {
+        HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+        response.Content = new StringContent(content);
+        return response;
+    }
+
     public static string getEventSource(dynamic current_event)
     {
-        string event_source = string.Empty;
-        string[] event_data = current_event.Split(".");
-        if (event_data.Length > 1)
-        {
-            event_source = event_data[1];
-        }
-        return event_source;
+        string[] event_data = current_event.Split('.');
+        return event_data.ElementAtOrDefault(1);
     }
 
     public static string getEventType(dynamic current_event)
     {
         string event_type = string.Empty;
-        string[] event_data = current_event.Split(".");
-        event_type = getEventSource(current_event).ToLower();
+        string[] event_data = current_event.Split('.');
+        event_type = getEventSource(current_event);
 
         for (int index = 2; index < event_data.Length; index++)
         {
-            event_type += "-" + event_data[index].ToLower();
+            event_type += "-" + event_data[index];
         }
 
-        return event_type;
+        return event_type.ToLower();
     }
 
     public static dynamic getRequestDataFromRequestObject(string event_source, dynamic requestObject)
     {
-        var req_data = requestObject[0]["data"];
+        var req_data = requestObject;
+
+        if (requestObject != null && requestObject[0] != null && requestObject[0]["data"] != null)
+        {
+            req_data = requestObject[0]["data"];
+        }
+        else
+        {
+            return createHttpResponse(HttpStatusCode.OK, "request object does not have the required property 'data' !");
+        } 
 
         switch (event_source)
         {
@@ -112,10 +125,11 @@ public static class GridEventHandler
                 break;
 
             default:
-                return (ActionResult)new OkObjectResult("Unrecognized event, could not be sent");
+                return createHttpResponse(HttpStatusCode.OK, "Unrecognized event, could not be sent");
 
         }
 
+        //Handling the scenario if data is string instead of Json
         string req_type = req_data.GetType().ToString();
         if (req_type == "Newtonsoft.Json.Linq.JValue")
         {
@@ -181,13 +195,14 @@ public static class GridEventHandler
     }
 
     [FunctionName("generic_triggers")]
-    public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req, ILogger log, ExecutionContext context)
+    public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequestMessage req, ILogger log, ExecutionContext context)
     {
         log.LogInformation("C# HTTP trigger function processed a request.");
 
-        string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+        string requestBody = await req.Content.ReadAsStringAsync();
         dynamic requestObject = JsonConvert.DeserializeObject(requestBody);
-        var current_event = requestObject[0]["eventType"].ToString();
+
+        string current_event = requestObject[0]["eventType"].ToString();
 
         //acknowledge if this is a subscription event
         if (current_event == "Microsoft.EventGrid.SubscriptionValidationEvent")
@@ -195,26 +210,33 @@ public static class GridEventHandler
             string webhook_res = ParseEventGridValidationCode(requestObject);
             if (!string.IsNullOrEmpty(webhook_res))
             {
-                return (ActionResult)new OkObjectResult($"{webhook_res}");
+                return createHttpResponse(HttpStatusCode.OK, webhook_res);
             }
         }
-        
-        string event_type = getEventType(current_event);
-        string event_source = getEventSource(current_event);
-       
-        string repo_name = string.Empty;
 
-        if (!req.GetQueryParameterDictionary().TryGetValue("repoName", out repo_name)){    
-           //repo name not provided event could not be sent
-           return (ActionResult)new OkObjectResult("Github repository name not provided, could not be sent");
+        string event_type = getEventType(current_event);
+        log.LogInformation("event type : " + event_type);
+
+        string event_source = getEventSource(current_event);
+        log.LogInformation("event source : " + event_source);
+
+        var queryParams = System.Web.HttpUtility.ParseQueryString(req.RequestUri.Query);
+        string repo_name = queryParams.Get("repoName");
+
+        if (string.IsNullOrEmpty(repo_name))
+        {
+            //repo name not provided event could not be sent
+            return createHttpResponse(HttpStatusCode.OK, "Github repository name not provided, could not be sent");
         }
 
-        log.LogInformation("fetching repo name from query parameters." + repo_name);
+        log.LogInformation("fetching repo name from query parameters: " + repo_name);
 
 
         if (!string.IsNullOrEmpty(repo_name))
         {
             var req_data = getRequestDataFromRequestObject(event_source, requestObject);
+            if (req_data is HttpResponseMessage)
+                return req_data;
 
             using (var httpClient = new System.Net.Http.HttpClient())
             {
@@ -222,7 +244,7 @@ public static class GridEventHandler
                 httpClient.DefaultRequestHeaders.Add("User-Agent", "Awesome-Octocat-App");
                 httpClient.DefaultRequestHeaders.Accept.Clear();
 
-                var PATTOKEN = Environment.GetEnvironmentVariable("PAT_TOKEN", EnvironmentVariableTarget.Process);
+                var PATTOKEN = "02998a31188ac120c15bbce9458aa78abec79e6b"; //Environment.GetEnvironmentVariable("PAT_TOKEN", EnvironmentVariableTarget.Process);
 
                 httpClient.DefaultRequestHeaders.Add("Authorization", "token " + PATTOKEN);
 
@@ -238,15 +260,20 @@ public static class GridEventHandler
 
                 var content = new StringContent(payload, Encoding.UTF8, "application/json");
                 HttpResponseMessage response = await httpClient.PostAsync("https://api.github.com/repos/" + repo_name + "/dispatches", content);
-                
+
+                log.LogInformation("response from github " + await response.Content.ReadAsStringAsync());
+
                 if (response.StatusCode.ToString() == "Unauthorized")
-                   return (ActionResult)new OkObjectResult("Unauthorized dispatch event could not be sent, PATTOKEN is Not Valid");
-                
-                var resultString = await response.Content.ReadAsStringAsync();
-                return (ActionResult)new OkObjectResult("dispatch event sent");
+                {
+                    response.Content = new StringContent("Unauthorized, dispatch event could not be sent, check PATTOKEN");
+                    return response;
+                }
+
+                response.StatusCode = HttpStatusCode.OK;
+                response.Content = new StringContent("dispatch event sent");
+                return response;
             }
         }
-
-        return (ActionResult)new OkObjectResult(current_event);
+        return createHttpResponse(HttpStatusCode.OK, current_event);
     }
 }
