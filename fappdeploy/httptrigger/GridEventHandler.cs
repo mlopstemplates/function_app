@@ -260,12 +260,6 @@ public static class GridEventHandler
 
                 log.LogInformation("response from github " + await response.Content.ReadAsStringAsync());
 
-                if (response.StatusCode.ToString() == "Unauthorized")
-                {
-                    response.Content = new StringContent("Unauthorized, dispatch event could not be sent, check PATTOKEN");
-                    return response;
-                }
-
                 response.StatusCode = HttpStatusCode.OK;
                 response.Content = new StringContent("dispatch event sent");
                 return response;
