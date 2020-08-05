@@ -9,11 +9,23 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Net.Http;
 using System.Net;
+using Microsoft.Extensions.Configuration;
+using System.Dynamic;
+using System.Collections.Specialized;
 
 public static class GridEventHandler
 {
 
-    public static string ParseEventGridValidationCode(dynamic requestObject)
+    private static bool isValidRequestObject(dynamic requestObject)
+    {
+        if (requestObject == null || requestObject[0] == null
+            || requestObject[0]["eventType"] == null || requestObject[0]["data"] == null)
+            return false;
+
+        return true;
+    }
+
+    private static string ParseEventGridValidationCode(dynamic requestObject)
     {
         var webhook_res = string.Empty;
         if (requestObject != null && requestObject[0]["data"] != null)
@@ -27,20 +39,20 @@ public static class GridEventHandler
         return webhook_res;
     }
 
-    public static HttpResponseMessage createHttpResponse(HttpStatusCode statusCode, string content)
+    private static HttpResponseMessage createHttpResponse(HttpStatusCode statusCode, string content)
     {
-        HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+        HttpResponseMessage response = new HttpResponseMessage(statusCode);
         response.Content = new StringContent(content);
         return response;
     }
 
-    public static string getEventSource(dynamic current_event)
+    private static string getEventSource(string current_event)
     {
         string[] event_data = current_event.Split('.');
         return event_data.ElementAtOrDefault(1);
     }
 
-    public static string getEventType(dynamic current_event)
+    private static string getEventType(string current_event)
     {
         string event_type = string.Empty;
         string[] event_data = current_event.Split('.');
@@ -50,21 +62,20 @@ public static class GridEventHandler
         {
             event_type += "-" + event_data[index];
         }
-
         return event_type.ToLower();
     }
 
-    public static dynamic getRequestDataFromRequestObject(string event_source, dynamic requestObject)
+    private static object getRequestDataFromRequestObject(string event_source, dynamic requestObject)
     {
         var req_data = requestObject;
 
-        if (requestObject != null && requestObject[0] != null && requestObject[0]["data"] != null)
+        if (!string.IsNullOrEmpty(event_source) && requestObject != null && requestObject[0] != null && requestObject[0]["data"] != null)
         {
             req_data = requestObject[0]["data"];
         }
         else
         {
-            return createHttpResponse(HttpStatusCode.OK, "request object does not have the required property 'data' !");
+            return null;
         } 
 
         switch (event_source)
@@ -122,7 +133,7 @@ public static class GridEventHandler
                 break;
 
             default:
-                return createHttpResponse(HttpStatusCode.OK, "Unrecognized event, could not be sent");
+                return null;
 
         }
 
@@ -199,6 +210,12 @@ public static class GridEventHandler
         string requestBody = await req.Content.ReadAsStringAsync();
         dynamic requestObject = JsonConvert.DeserializeObject(requestBody);
 
+        if (!isValidRequestObject(requestObject))
+        {
+            log.LogInformation("Request object does not contain required data");
+            return createHttpResponse(HttpStatusCode.BadRequest, "Unable to process the request");
+        }
+
         string current_event = requestObject[0]["eventType"].ToString();
 
         //acknowledge if this is a subscription event
@@ -217,14 +234,10 @@ public static class GridEventHandler
         string event_source = getEventSource(current_event);
         log.LogInformation("event source : " + event_source);
 
-        var queryParams = System.Web.HttpUtility.ParseQueryString(req.RequestUri.Query);
-        string repo_name = queryParams.Get("repoName");
+        var uri = new Uri(req.RequestUri.ToString());
+        NameValueCollection queryParams = uri.ParseQueryString();
 
-        if (string.IsNullOrEmpty(repo_name))
-        {
-            //repo name not provided event could not be sent
-            return createHttpResponse(HttpStatusCode.OK, "Github repository name not provided, could not be sent");
-        }
+        string repo_name = queryParams.Get("repoName");
 
         log.LogInformation("fetching repo name from query parameters: " + repo_name);
 
@@ -232,8 +245,11 @@ public static class GridEventHandler
         if (!string.IsNullOrEmpty(repo_name))
         {
             var req_data = getRequestDataFromRequestObject(event_source, requestObject);
-            if (req_data is HttpResponseMessage)
-                return req_data;
+            if (req_data == null)
+            {
+                log.LogInformation("Request object does not contain required data");
+                return createHttpResponse(HttpStatusCode.BadRequest, "Unable to process the request");
+            }
 
             using (var httpClient = new System.Net.Http.HttpClient())
             {
@@ -242,6 +258,12 @@ public static class GridEventHandler
                 httpClient.DefaultRequestHeaders.Accept.Clear();
 
                 var PATTOKEN = Environment.GetEnvironmentVariable("PAT_TOKEN", EnvironmentVariableTarget.Process);
+                
+                if(PATTOKEN == null)
+                {
+                    log.LogInformation("PATTOKEN not provided");
+                    return createHttpResponse(HttpStatusCode.BadRequest, "Unable to process the request");
+                }
 
                 httpClient.DefaultRequestHeaders.Add("Authorization", "token " + PATTOKEN);
 
@@ -258,13 +280,22 @@ public static class GridEventHandler
                 var content = new StringContent(payload, Encoding.UTF8, "application/json");
                 HttpResponseMessage response = await httpClient.PostAsync("https://api.github.com/repos/" + repo_name + "/dispatches", content);
 
+                if(response.StatusCode != HttpStatusCode.OK)
+                {
+                    log.LogInformation(response.StatusCode + " Unable to process the request: " + await response.Content.ReadAsStringAsync());
+                    return createHttpResponse(response.StatusCode, "Unable to process the request: " + event_type);
+                }
+
                 log.LogInformation("response from github " + await response.Content.ReadAsStringAsync());
 
-                response.StatusCode = HttpStatusCode.OK;
-                response.Content = new StringContent("dispatch event sent");
-                return response;
+                log.LogInformation("dispatched "+ event_type);
+                return createHttpResponse(HttpStatusCode.OK, "dispatched "+ event_type );
             }
         }
-        return createHttpResponse(HttpStatusCode.OK, current_event);
+        else
+        {
+            log.LogInformation("query param 'repoName' not provided");
+            return createHttpResponse(HttpStatusCode.BadRequest, "Unable to process the request");
+        }
     }
 }
