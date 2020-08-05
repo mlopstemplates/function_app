@@ -5,10 +5,9 @@ namespace FunctionAppTest
 {
     public class TestFactory 
     {
-        public static HttpRequestMessage CreateHttpRequest(string queryStringKey , string queryStringValue, dynamic data = null)
+        public static HttpRequestMessage CreateHttpRequest()
         {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://dummyuri?repoName=dummyrepo");
-            requestMessage.Content = new StringContent(data, Encoding.UTF8, "application/json");
+            var requestMessage = new HttpRequestMessage();     
             return requestMessage;
         }
     }
