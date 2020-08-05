@@ -9,8 +9,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Net.Http;
 using System.Net;
-using Microsoft.Extensions.Configuration;
-using System.Dynamic;
 using System.Collections.Specialized;
 
 public static class GridEventHandler
